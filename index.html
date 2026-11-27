@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>THAMAI STUDIO | Photo Gallery</title>
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/waritton5689/logo/favicon.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Kanit', sans-serif; background: #f5f5f5; color: #222; }
+
+    /* HEADER */
+    .hero {
+      height: 480px;
+      background: linear-gradient(135deg,#aaa49e,#e7e3df);
+      background-size: cover;
+      background-position: center 40%;
+      transition: background-image .3s;
+    }
+
+    /* MAIN */
+    .gallery-container {
+      width: 90%;
+      max-width: 1300px;
+      min-height: 650px;
+      margin: -78px auto 50px;
+      position: relative;
+      background: white;
+      border-radius: 42px 42px 0 0;
+      padding: 45px;
+      box-shadow: 0 10px 45px rgba(0,0,0,.09);
+    }
+
+    /* LOGO */
+    .logo {
+      position: absolute;
+      top: -88px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 175px;
+      height: 175px;
+      border-radius: 50%;
+      border: 7px solid white;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 5px 18px #0002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .logo-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .logo-fallback {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+
+    .logo.no-img { outline: 1px solid #222; outline-offset: -13px; }
+    .logo.no-img .logo-img { display: none; }
+    .logo.no-img .logo-fallback { display: flex; }
+
+    .logo strong {
+      font-family: 'Playfair Display', serif;
+      font-size: 25px;
+      letter-spacing: 2px;
+      line-height: 1.05;
+    }
+
+    .logo span { font-size: 12px; font-weight: 600; letter-spacing: 1px; margin-top: 10px; }
+
+    /* SOCIAL */
+    .social { display: flex; justify-content: space-between; align-items: center; min-height: 85px; }
+    .social a { text-decoration: none; font-size: 24px; font-weight: 500; }
+    .facebook { color: #1877f2; }
+    .instagram { color: #d62976; }
+
+    /* ALBUM TITLE */
+    .album-title { text-align: center; margin: 30px 0 35px; }
+
+    .album-title h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      overflow-wrap: anywhere;
+    }
+
+    .album-title p { color: #888; font-size: 13px; letter-spacing: 3px; margin-top: 5px; }
+    .total { color: #999; font-size: 13px; margin-top: 12px; }
+
+    /* ADMIN BUTTON */
+    .admin-top { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
+
+    button { font-family: inherit; }
+
+    .action-btn {
+      border: none;
+      border-radius: 30px;
+      padding: 11px 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .action-btn:hover { opacity: .8; transform: translateY(-1px); }
+    .btn-dark { background: #222; color: white; }
+    .btn-light { background: #f0f0f0; color: #333; }
+
+    /* ADMIN PANEL */
+    .admin-panel {
+      display: none;
+      padding: 25px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 15px;
+      margin: 20px 0 30px;
+    }
+
+    .admin-panel.show { display: block; }
+    .admin-panel h2 { font-size: 21px; margin-bottom: 5px; }
+    .admin-panel h3 { font-size: 16px; margin-top: 10px; }
+    .admin-panel p { font-size: 13px; color: #888; }
+    .admin-panel label { display: block; font-size: 13px; margin-top: 18px; color: #555; }
+
+    .admin-panel input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      outline: none;
+      margin-top: 7px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .admin-panel input:focus { border-color: #999; }
+    .admin-panel input[type="file"] { display: block; margin: 15px 0; max-width: 100%; }
+    .admin-divider { border: none; border-top: 1px solid #e5e5e5; margin: 23px 0; }
+
+    .admin-status {
+      color: #777;
+      font-size: 13px;
+      margin-top: 15px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 7px;
+    }
+
+    .admin-status.error { color: #c0392b; }
+
+    /* GALLERY */
+    .gallery { display: grid; grid-template-columns: repeat(4,1fr); gap: 15px; }
+
+    .photo {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      aspect-ratio: 3 / 4;
+      background: #eee;
+      cursor: pointer;
+      box-shadow: 0 2px 5px #0001;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .5s ease;
+    }
+
+    .photo:hover img { transform: scale(1.06); }
+
+    .photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 60%, rgba(0,0,0,.5));
+      opacity: 0;
+      transition: .3s;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 15px;
+      pointer-events: none;
+    }
+
+    .photo:hover .photo-overlay { opacity: 1; }
+
+    .download-btn {
+      pointer-events: auto;
+      background: white;
+      color: #222;
+      padding: 9px 17px;
+      border-radius: 25px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .admin-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #d93636;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 12px;
+      cursor: pointer;
+      z-index: 5;
+      font-size: 12px;
+    }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 70px 10px; color: #999; grid-column: 1 / -1; }
+
+    .spinner {
+      width: 35px;
+      height: 35px;
+      border: 3px solid #eee;
+      border-top-color: #555;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 99;
+      background: rgba(0,0,0,.93);
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
+    }
+
+    .modal.show { display: flex; }
+
+    .modal img { max-width: 90%; max-height: 82vh; object-fit: contain; border-radius: 5px; }
+
+    .close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 35px;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .modal-download {
+      position: absolute;
+      bottom: 20px;
+      background: white;
+      color: #222;
+      padding: 10px 25px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    footer { text-align: center; padding: 25px; color: #aaa; font-size: 12px; letter-spacing: 2px; }
+
+    /* HELP POPUP */
+    .help-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      background: rgba(0,0,0,.6);
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .help-modal.show { display: flex; }
+
+    .help-card {
+      position: relative;
+      background: white;
+      border-radius: 22px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 28px 26px 24px;
+      box-shadow: 0 15px 50px rgba(0,0,0,.35);
+    }
+
+    .help-card h2 { font-size: 21px; margin-bottom: 4px; }
+    .help-card .help-sub { color: #888; font-size: 13px; margin-bottom: 18px; }
+    .help-card h3 { font-size: 15px; margin: 18px 0 8px; }
+    .help-card ol { padding-left: 22px; font-size: 14px; line-height: 1.75; color: #444; }
+
+    .help-card .help-tip {
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: #f6f6f6;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.7;
+    }
+
+    .help-close {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      border: none;
+      background: none;
+      font-size: 28px;
+      color: #888;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .help-ok { display: block; width: 100%; margin-top: 20px; }
+
+    /* MULTI SELECT */
+    .photo-check {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid white;
+      background: rgba(0,0,0,.3);
+      color: white;
+      font-size: 15px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .gallery.selecting .photo-check { display: flex; }
+    .gallery.selecting .photo-overlay { display: none; }
+    .photo.selected { outline: 3px solid #222; outline-offset: -3px; }
+    .photo.selected .photo-check { background: #222; }
+
+    .select-bar {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      z-index: 50;
+      background: #222;
+      color: white;
+      padding: 10px 12px 10px 20px;
+      border-radius: 40px;
+      box-shadow: 0 6px 25px rgba(0,0,0,.3);
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      max-width: 94%;
+      white-space: nowrap;
+    }
+
+    .select-bar.show { display: flex; }
+
+    .select-bar button {
+      border: none;
+      border-radius: 25px;
+      padding: 9px 16px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .select-bar .sb-download { background: white; color: #222; }
+    .select-bar .sb-download:disabled { opacity: .5; cursor: default; }
+    .select-bar .sb-cancel { background: #444; color: white; }
+
+    /* RESPONSIVE */
+    @media(max-width:900px) {
+      .gallery { grid-template-columns: repeat(3,1fr); }
+      .gallery-container { padding: 30px; }
+    }
+
+    @media(max-width:600px) {
+      .hero { height: 300px; background-position: center; }
+
+      .gallery-container {
+        width: 95%;
+        margin-top: -40px;
+        padding: 18px 12px;
+        border-radius: 25px 25px 0 0;
+      }
+
+      .logo { width: 120px; height: 120px; top: -60px; border-width: 5px; }
+      .logo.no-img { outline-offset: -9px; }
+      .logo-fallback { padding: 0 14px; }
+      .logo strong { font-size: 15px; letter-spacing: 1px; line-height: 1.1; }
+      .logo span { font-size: 6.5px; letter-spacing: .5px; margin-top: 5px; white-space: nowrap; }
+      .social { min-height: 60px; }
+      .social a { font-size: 15px; }
+      .album-title h1 { font-size: 24px; }
+      .gallery { grid-template-columns: repeat(2,1fr); gap: 8px; }
+      .photo { border-radius: 7px; }
+      .photo-overlay { opacity: 1; padding: 6px; }
+      .download-btn { font-size: 10px; padding: 5px 10px; }
+      .modal img { max-width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="hero" id="hero"></div>
+
+  <!-- MAIN GALLERY -->
+  <main class="gallery-container">
+
+    <!-- LOGO -->
+    <div class="logo" id="logo">
+      <img
+        class="logo-img"
+        src="https://cdn.jsdelivr.net/gh/waritton5689/logo/favicon.png"
+        alt="THAMAI STUDIO"
+        referrerpolicy="no-referrer"
+        onerror="document.getElementById('logo').classList.add('no-img')"
+      >
+
+      <div class="logo-fallback">
+        <strong>THAMAI<br>STUDIO</strong>
+        <span>PHOTO GALLERY</span>
+      </div>
+    </div>
+
+    <!-- SOCIAL LINKS -->
+    <div class="social">
+      <a href="https://www.facebook.com/thamaipr/" target="_blank" rel="noopener" class="facebook">
+        f Facebook
+      </a>
+
+      <a href="https://www.instagram.com/thamai_school/" target="_blank" rel="noopener" class="instagram">
+        ◎ Instagram
+      </a>
+    </div>
+
+    <!-- ALBUM TITLE -->
+    <div class="album-title">
+      <h1 id="albumName">THAMAI STUDIO</h1>
+      <p id="albumSubtitle">PHOTO GALLERY</p>
+      <div class="total" id="total">กำลังโหลดภาพ...</div>
+    </div>
+
+    <!-- ADMIN ACCESS -->
+    <div class="admin-top">
+      <button class="action-btn btn-light" onclick="openHelp()">
+        ? วิธีดาวน์โหลดรูป
+      </button>
+
+      <button class="action-btn btn-dark" id="selectToggleBtn" onclick="toggleSelectMode()">
+        ✓ เลือกหลายภาพ
+      </button>
+
+      <button class="action-btn btn-light" onclick="openAdmin()">
+        ⚙ จัดการอัลบั้ม
+      </button>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="admin-panel" id="adminPanel">
+
+      <h2>STUDIO | ADMIN</h2>
+      <p>จัดการอัลบั้มภาพ Google Drive</p>
+
+      <hr class="admin-divider">
+
+      <h3>ชื่ออัลบั้ม / ชื่องาน</h3>
+
+      <input type="text" id="eventNameInput" placeholder="เช่น งานต่างๆ">
+
+      <button class="action-btn btn-dark" onclick="saveEventName()" style="margin-top:12px">
+        บันทึกชื่องาน
+      </button>
+
+      <label>Google Drive Folder ID</label>
+
+      <input type="text" id="folderIdInput" placeholder="วาง Folder ID ที่นี่">
+
+      <button class="action-btn btn-dark" onclick="saveFolder()" style="margin-top:12px">
+        บันทึก Folder ID
+      </button>
+
+      <hr class="admin-divider">
+
+      <h3>เพิ่มรูปภาพ</h3>
+
+      <input type="file" id="uploadFiles" accept="image/*" multiple>
+
+      <button class="action-btn btn-dark" onclick="uploadPhotos()">
+        + อัปโหลดภาพเข้า Drive
+      </button>
+
+      <div class="admin-status" id="adminStatus">พร้อมจัดการอัลบั้ม</div>
+
+      <button class="action-btn btn-light" onclick="closeAdmin()" style="margin-top:15px">
+        ออกจากระบบ
+      </button>
+
+    </div>
+
+    <!-- GALLERY -->
+    <div class="gallery" id="gallery">
+      <div class="loading">
+        <div class="spinner"></div>
+        กำลังโหลดภาพจาก Google Drive
+      </div>
+    </div>
+
+    <footer>POWERED BY THAMAI STUDIO</footer>
+
+  </main>
+
+  <!-- HELP POPUP -->
+  <div class="help-modal" id="helpModal">
+    <div class="help-card">
+      <button class="help-close" onclick="closeHelp()">×</button>
+
+      <h2>วิธีดาวน์โหลดรูปภาพ</h2>
+      <div class="help-sub">เลือกวิธีที่สะดวกสำหรับคุณ</div>
+
+      <h3>📷 โหลดทีละรูป</h3>
+      <ol>
+        <li>แตะที่รูปที่ต้องการ เพื่อเปิดดูภาพใหญ่</li>
+        <li>กดปุ่ม <b>↓ ดาวน์โหลดภาพ</b> ที่ด้านล่างของภาพ</li>
+        <li>(หรือกดปุ่ม <b>↓ ดาวน์โหลด</b> ที่มุมล่างของรูปในหน้าแกลเลอรีได้เลย)</li>
+      </ol>
+
+      <h3>🖼️ โหลดหลายรูปพร้อมกัน (สูงสุด 10 รูป)</h3>
+      <ol>
+        <li>กดปุ่ม <b>✓ เลือกหลายภาพ</b></li>
+        <li>แตะรูปที่ต้องการ จะมีเครื่องหมายถูกขึ้นที่รูป</li>
+        <li>กดปุ่ม <b>💾 บันทึกลงอัลบั้ม</b> ที่แถบด้านล่าง รอให้เตรียมภาพจนครบ</li>
+        <li>เมื่อขึ้นว่า <b>✓ แตะเพื่อบันทึก</b> ให้แตะอีกครั้ง</li>
+        <li>ในเมนูที่เด้งขึ้น เลือก <b>บันทึกรูปภาพ</b> (iPhone) หรือบันทึกลงแกลเลอรี/Google Photos (Android)</li>
+      </ol>
+
+      <div class="help-tip">
+        💡 <b>เคล็ดลับ</b><br>
+        • ถ้าเปิดลิงก์จากแอป LINE หรือ Facebook แล้วโหลดไม่ได้ ให้กดเมนู (⋯) แล้วเลือก <b>"เปิดในเบราว์เซอร์"</b> (Safari / Chrome)<br>
+        • บนคอมพิวเตอร์ ไฟล์จะถูกดาวน์โหลดทีละภาพไปที่โฟลเดอร์ Downloads หากเบราว์เซอร์ถามให้ดาวน์โหลดหลายไฟล์ ให้กด <b>อนุญาต</b>
+      </div>
+
+      <button class="action-btn btn-dark help-ok" onclick="closeHelp()">เข้าใจแล้ว</button>
+    </div>
+  </div>
+
+  <!-- SELECTION BAR -->
+  <div class="select-bar" id="selectBar">
+    <span id="selectCount">เลือกแล้ว 0/10</span>
+
+    <button class="sb-download" id="selectDownloadBtn" onclick="downloadSelected()">
+      ↓ ดาวน์โหลด
+    </button>
+
+    <button class="sb-cancel" onclick="toggleSelectMode()">ยกเลิก</button>
+  </div>
+
+  <!-- IMAGE MODAL -->
+  <div class="modal" id="modal">
+    <button class="close" onclick="closeModal()">×</button>
+
+    <img id="modalImage" alt="">
+
+    <a id="modalDownload" class="modal-download" target="_blank" rel="noopener">
+      ↓ ดาวน์โหลดภาพ
+    </a>
+  </div>
+
+  <script>
+    // =====================================================
+    // ตั้งค่า: วาง URL ของ Web App (ลงท้ายด้วย /exec) ที่นี่
+    // =====================================================
+    const API_URL = 'วาง_WEB_APP_URL_ที่นี่';
+
+    // =====================================================
+    // ตัวเชื่อมกับ Apps Script
+    // (ทำให้โค้ดด้านล่างเรียก google.script.run ได้เหมือนเดิม)
+    // =====================================================
+
+    async function callApi(fn, args) {
+      if (!API_URL || API_URL.indexOf('https://') !== 0) {
+        throw new Error('ยังไม่ได้ตั้งค่า API_URL ใน index.html');
+      }
+
+      // ใช้ text/plain เพื่อเลี่ยง CORS preflight ของ Apps Script
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ fn: fn, args: args || [] })
+      });
+
+      let json;
+      try {
+        json = await res.json();
+      } catch (e) {
+        throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ (ตรวจสอบ API_URL และการ Deploy)');
+      }
+
+      if (!json.ok) throw new Error(json.error || 'เกิดข้อผิดพลาด');
+      return json.data;
+    }
+
+    const google = {
+      script: {
+        get run() {
+          let ok = function () {};
+          let fail = function () {};
+
+          const proxy = new Proxy({}, {
+            get(_, name) {
+              if (name === 'withSuccessHandler') {
+                return f => { ok = f; return proxy; };
+              }
+              if (name === 'withFailureHandler') {
+                return f => { fail = f; return proxy; };
+              }
+              return (...args) => {
+                callApi(name, args).then(ok, fail);
+              };
+            }
+          });
+
+          return proxy;
+        }
+      }
+    };
+
+    // =====================================
+    // GLOBAL VARIABLES
+    // =====================================
+
+    let allImages = [];
+    let adminPin = '';
+    let lastGallerySignature = '';
+    let lastHeroUrl = '';
+    let isLoading = false;
+
+    const MAX_DOWNLOAD = 10;
+    let selectMode = false;
+    const selectedIds = new Set();
+    let preparedFiles = null;
+    let preparing = false;
+
+    // =====================================
+    // โหลดภาพแบบมี fallback + retry
+    // =====================================
+
+    function loadImg(img, urls) {
+      let i = 0;
+      let retries = 0;
+
+      img.referrerPolicy = 'no-referrer';
+
+      img.onerror = function () {
+        i++;
+
+        if (i < urls.length) {
+          img.src = urls[i];
+        } else if (retries < 2) {
+          retries++;
+          i = 0;
+
+          setTimeout(function () {
+            const base = urls[0];
+            img.src = base + (base.indexOf('?') >= 0 ? '&' : '?') + 'r=' + Date.now();
+          }, 1500 * retries);
+        }
+      };
+
+      img.src = urls[0];
+    }
+
+    function setHero(url, fallback) {
+      const hero = document.getElementById('hero');
+      const test = new Image();
+
+      test.referrerPolicy = 'no-referrer';
+
+      test.onload = function () {
+        hero.style.backgroundImage =
+          'linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.15)),url("' + url + '")';
+      };
+
+      test.onerror = function () {
+        if (fallback) setHero(fallback);
+      };
+
+      test.src = url;
+    }
+
+    // =====================================
+    // LOAD GALLERY
+    // =====================================
+
+    function loadGallery() {
+      refreshGallery();
+    }
+
+    function refreshGallery() {
+      if (isLoading) return;
+
+      isLoading = true;
+
+      google.script.run
+        .withSuccessHandler(data => {
+          isLoading = false;
+          renderGallery(data);
+        })
+        .withFailureHandler(error => {
+          isLoading = false;
+          document.getElementById('gallery').textContent =
+            'เกิดข้อผิดพลาด: ' + error.message;
+        })
+        .getGalleryImages();
+    }
+
+    // =====================================
+    // RENDER GALLERY
+    // =====================================
+
+    function renderGallery(data) {
+      allImages = data.images || [];
+
+      const existingIds = new Set(allImages.map(p => p.id));
+      Array.from(selectedIds).forEach(id => {
+        if (!existingIds.has(id)) selectedIds.delete(id);
+      });
+      updateSelectBar();
+
+      document.getElementById('albumName').textContent = data.albumName || 'THAMAI STUDIO';
+      document.getElementById('albumSubtitle').textContent = data.subtitle || 'PHOTO GALLERY';
+      document.title = (data.albumName || 'THAMAI STUDIO') + ' | Photo Gallery';
+
+      updateTotal(data);
+
+      const hero = document.getElementById('hero');
+
+      if (allImages.length > 0) {
+        if (lastHeroUrl !== allImages[0].preview) {
+          lastHeroUrl = allImages[0].preview;
+          setHero(allImages[0].preview, allImages[0].previewAlt);
+        }
+      } else {
+        lastHeroUrl = '';
+        hero.style.backgroundImage = 'linear-gradient(135deg,#aaa49e,#e7e3df)';
+      }
+
+      const signature = JSON.stringify({
+        configured: !!data.configured,
+        albumName: data.albumName || '',
+        subtitle: data.subtitle || '',
+        images: allImages.map(photo => [photo.id, photo.name, photo.updated])
+      });
+
+      if (signature === lastGallerySignature) return;
+
+      lastGallerySignature = signature;
+
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+
+      if (!data.configured) {
+        gallery.innerHTML = '<div class="loading">ยังไม่ได้ตั้งค่า Google Drive Folder</div>';
+        return;
+      }
+
+      if (allImages.length === 0) {
+        gallery.innerHTML = '<div class="loading">ยังไม่มีภาพในอัลบั้ม</div>';
+        return;
+      }
+
+      allImages.forEach((photo, index) => {
+        const item = document.createElement('div');
+        item.className = 'photo';
+
+        const img = document.createElement('img');
+        img.alt = photo.name;
+        img.decoding = 'async';
+        loadImg(img, [photo.thumbnail, photo.thumbnailAlt]);
+
+        item.appendChild(img);
+
+        const overlay = document.createElement('div');
+        overlay.className = 'photo-overlay';
+
+        const download = document.createElement('button');
+        download.className = 'download-btn';
+        download.textContent = '↓ ดาวน์โหลด';
+
+        download.onclick = event => {
+          event.stopPropagation();
+          window.open(photo.download, '_blank');
+        };
+
+        overlay.appendChild(download);
+        item.appendChild(overlay);
+
+        if (adminPin) {
+          const del = document.createElement('button');
+          del.className = 'admin-delete';
+          del.textContent = 'ลบ';
+
+          del.onclick = event => {
+            event.stopPropagation();
+            deletePhoto(photo.id, photo.name);
+          };
+
+          item.appendChild(del);
+        }
+
+        const check = document.createElement('div');
+        check.className = 'photo-check';
+        check.textContent = '✓';
+        item.appendChild(check);
+
+        item.dataset.id = photo.id;
+        item.classList.toggle('selected', selectedIds.has(photo.id));
+
+        item.onclick = () => {
+          if (selectMode) {
+            toggleSelect(photo.id, item);
+          } else {
+            openModal(index);
+          }
+        };
+
+        gallery.appendChild(item);
+      });
+    }
+
+    function updateTotal(data) {
+      document.getElementById('total').textContent = 'TOTAL ' + (data.total || 0) + ' PHOTOS';
+    }
+
+    // =====================================
+    // HELP POPUP
+    // =====================================
+
+    function openHelp() {
+      document.getElementById('helpModal').classList.add('show');
+    }
+
+    function closeHelp() {
+      document.getElementById('helpModal').classList.remove('show');
+    }
+
+    document.getElementById('helpModal').onclick = function (event) {
+      if (event.target === this) closeHelp();
+    };
+
+    // =====================================
+    // MULTI SELECT + DOWNLOAD (สูงสุด 10 ภาพ)
+    // =====================================
+
+    function toggleSelectMode() {
+      if (preparing) return;
+
+      preparedFiles = null;
+      selectMode = !selectMode;
+
+      if (!selectMode) selectedIds.clear();
+
+      document.getElementById('gallery').classList.toggle('selecting', selectMode);
+
+      document.getElementById('selectToggleBtn').textContent =
+        selectMode ? '✕ ยกเลิกการเลือก' : '✓ เลือกหลายภาพ';
+
+      document.querySelectorAll('#gallery .photo').forEach(el => {
+        el.classList.toggle('selected', selectedIds.has(el.dataset.id));
+      });
+
+      updateSelectBar();
+    }
+
+    function toggleSelect(id, item) {
+      if (preparing) return;
+
+      preparedFiles = null;
+
+      if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+        item.classList.remove('selected');
+      } else {
+        if (selectedIds.size >= MAX_DOWNLOAD) {
+          alert('เลือกได้สูงสุด ' + MAX_DOWNLOAD + ' ภาพต่อครั้ง');
+          return;
+        }
+
+        selectedIds.add(id);
+        item.classList.add('selected');
+      }
+
+      updateSelectBar();
+    }
+
+    function updateSelectBar() {
+      const bar = document.getElementById('selectBar');
+      const count = selectedIds.size;
+
+      bar.classList.toggle('show', selectMode);
+
+      if (preparing) return;
+
+      const btn = document.getElementById('selectDownloadBtn');
+
+      if (preparedFiles) {
+        document.getElementById('selectCount').textContent =
+          'พร้อมแล้ว ' + preparedFiles.length + ' ภาพ';
+        btn.textContent = '✓ แตะเพื่อบันทึก';
+        btn.disabled = false;
+        return;
+      }
+
+      document.getElementById('selectCount').textContent =
+        'เลือกแล้ว ' + count + '/' + MAX_DOWNLOAD;
+
+      btn.textContent = canShareFiles() ? '💾 บันทึกลงอัลบั้ม' : '↓ ดาวน์โหลด';
+      btn.disabled = count === 0;
+    }
+
+    function triggerDownload(url) {
+      const frame = document.createElement('iframe');
+
+      frame.style.display = 'none';
+      frame.src = url;
+      document.body.appendChild(frame);
+
+      setTimeout(() => frame.remove(), 60000);
+    }
+
+    function canShareFiles() {
+      try {
+        return !!(
+          navigator.canShare &&
+          navigator.share &&
+          navigator.canShare({
+            files: [new File([new Uint8Array(1)], 't.jpg', { type: 'image/jpeg' })]
+          })
+        );
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function fetchPhotoFile(photo) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(r => {
+            const bin = atob(r.data);
+            const bytes = new Uint8Array(bin.length);
+
+            for (let i = 0; i < bin.length; i++) {
+              bytes[i] = bin.charCodeAt(i);
+            }
+
+            resolve(new File([bytes], r.name, { type: r.mimeType }));
+          })
+          .withFailureHandler(reject)
+          .getImageData(photo.id);
+      });
+    }
+
+    async function prepareFiles(list) {
+      const btn = document.getElementById('selectDownloadBtn');
+      const countText = document.getElementById('selectCount');
+
+      preparing = true;
+      btn.disabled = true;
+      btn.textContent = 'กำลังเตรียม...';
+      countText.textContent = 'เตรียมภาพ 0/' + list.length;
+
+      const files = new Array(list.length);
+      let done = 0;
+      let next = 0;
+
+      async function worker() {
+        while (next < list.length) {
+          const idx = next++;
+          files[idx] = await fetchPhotoFile(list[idx]);
+          done++;
+          countText.textContent = 'เตรียมภาพ ' + done + '/' + list.length;
+        }
+      }
+
+      try {
+        await Promise.all([worker(), worker(), worker()]);
+        preparedFiles = files;
+      } catch (error) {
+        preparedFiles = null;
+        alert('เตรียมภาพไม่สำเร็จ: ' + (error.message || error));
+      } finally {
+        preparing = false;
+        updateSelectBar();
+      }
+    }
+
+    async function shareFiles() {
+      const files = preparedFiles;
+      if (!files || !files.length) return;
+
+      try {
+        await navigator.share({ files: files });
+
+        preparedFiles = null;
+        selectMode = true;
+        toggleSelectMode();
+
+      } catch (error) {
+        if (error && error.name === 'AbortError') return;
+        saveFilesAsDownload(files);
+      }
+    }
+
+    function saveFilesAsDownload(files) {
+      files.forEach((file, i) => {
+        setTimeout(() => {
+          const url = URL.createObjectURL(file);
+          const a = document.createElement('a');
+
+          a.href = url;
+          a.download = file.name;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+
+          setTimeout(() => URL.revokeObjectURL(url), 60000);
+        }, i * 900);
+      });
+    }
+
+    function downloadSelected() {
+      if (preparing) return;
+
+      if (preparedFiles) {
+        shareFiles();
+        return;
+      }
+
+      const list = allImages.filter(p => selectedIds.has(p.id));
+
+      if (!list.length) {
+        alert('กรุณาเลือกภาพ');
+        return;
+      }
+
+      if (list.length > MAX_DOWNLOAD) {
+        alert('ดาวน์โหลดได้สูงสุด ' + MAX_DOWNLOAD + ' ภาพต่อครั้ง');
+        return;
+      }
+
+      if (canShareFiles()) {
+        prepareFiles(list);
+        return;
+      }
+
+      const btn = document.getElementById('selectDownloadBtn');
+      const countText = document.getElementById('selectCount');
+
+      btn.disabled = true;
+
+      list.forEach((photo, i) => {
+        setTimeout(() => {
+          countText.textContent = 'กำลังโหลด ' + (i + 1) + '/' + list.length;
+
+          triggerDownload(photo.download);
+
+          if (i === list.length - 1) {
+            setTimeout(() => {
+              btn.disabled = selectedIds.size === 0;
+              updateSelectBar();
+            }, 1500);
+          }
+        }, i * 1200);
+      });
+    }
+
+    // =====================================
+    // IMAGE MODAL
+    // =====================================
+
+    function openModal(index) {
+      const photo = allImages[index];
+      if (!photo) return;
+
+      const modalImg = document.getElementById('modalImage');
+
+      loadImg(modalImg, [photo.preview, photo.previewAlt, photo.thumbnail]);
+
+      document.getElementById('modalDownload').href = photo.download;
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+
+      const modalImg = document.getElementById('modalImage');
+      modalImg.onerror = null;
+      modalImg.removeAttribute('src');
+    }
+
+    document.getElementById('modal').onclick = function (event) {
+      if (event.target === this) closeModal();
+    };
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeModal();
+        closeHelp();
+      }
+    });
+
+    // =====================================
+    // ADMIN LOGIN
+    // =====================================
+
+    function openAdmin() {
+      if (adminPin) {
+        document.getElementById('adminPanel').classList.toggle('show');
+        return;
+      }
+
+      const pin = prompt('กรุณาใส่รหัสผ่าน Admin');
+      if (!pin) return;
+
+      setAdminStatus('กำลังตรวจสอบรหัสผ่าน...');
+
+      google.script.run
+        .withSuccessHandler(() => {
+          adminPin = pin;
+
+          document.getElementById('adminPanel').classList.add('show');
+
+          google.script.run
+            .withSuccessHandler(settings => {
+              document.getElementById('eventNameInput').value =
+                settings.albumName || 'THAMAI STUDIO';
+
+              document.getElementById('folderIdInput').value = settings.folderId || '';
+
+              setAdminStatus('เข้าสู่ระบบสำเร็จ');
+            })
+            .withFailureHandler(error => {
+              setAdminStatus(error.message, true);
+            })
+            .getGallerySettings(adminPin);
+
+          lastGallerySignature = '';
+          refreshGallery();
+        })
+        .withFailureHandler(error => {
+          setAdminStatus(error.message, true);
+          alert(error.message);
+        })
+        .checkAdmin(pin);
+    }
+
+    function closeAdmin() {
+      adminPin = '';
+
+      document.getElementById('adminPanel').classList.remove('show');
+
+      lastGallerySignature = '';
+      refreshGallery();
+    }
+
+    function setAdminStatus(message, error = false) {
+      const status = document.getElementById('adminStatus');
+
+      status.textContent = message;
+      status.classList.toggle('error', error);
+    }
+
+    // =====================================
+    // SAVE FOLDER ID
+    // =====================================
+
+    function saveFolder() {
+      if (!adminPin) {
+        alert('กรุณาเข้าสู่ระบบ Admin');
+        return;
+      }
+
+      const folderId = document.getElementById('folderIdInput').value.trim();
+
+      if (!folderId) {
+        alert('กรุณากรอก Folder ID');
+        return;
+      }
+
+      setAdminStatus('กำลังตรวจสอบ Folder ID...');
+
+      google.script.run
+        .withSuccessHandler(result => {
+          setAdminStatus('เชื่อมต่อสำเร็จ: ' + result.folderName);
+
+          lastGallerySignature = '';
+          refreshGallery();
+        })
+        .withFailureHandler(error => {
+          setAdminStatus(error.message, true);
+          alert(error.message);
+        })
+        .saveFolderId(adminPin, folderId);
+    }
+
+    // =====================================
+    // UPLOAD PHOTOS
+    // =====================================
+
+    async function uploadPhotos() {
+      if (!adminPin) {
+        alert('กรุณาเข้าสู่ระบบ Admin');
+        return;
+      }
+
+      const input = document.getElementById('uploadFiles');
+      const files = Array.from(input.files);
+
+      if (!files.length) {
+        alert('กรุณาเลือกภาพ');
+        return;
+      }
+
+      if (files.length > 5) {
+        alert('อัปโหลดได้ครั้งละไม่เกิน 5 ภาพ');
+        return;
+      }
+
+      if (files.some(file => !file.type.startsWith('image/'))) {
+        alert('กรุณาเลือกเฉพาะไฟล์ภาพ');
+        return;
+      }
+
+      if (files.some(file => file.size > 5 * 1024 * 1024)) {
+        alert('ภาพแต่ละไฟล์ต้องไม่เกิน 5 MB');
+        return;
+      }
+
+      try {
+        const uploadData = [];
+
+        for (const file of files) {
+          setAdminStatus('กำลังเตรียมภาพ ' + file.name);
+
+          const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+
+          uploadData.push({ name: file.name, mimeType: file.type, data: base64 });
+        }
+
+        setAdminStatus('กำลังอัปโหลดภาพ...');
+
+        google.script.run
+          .withSuccessHandler(result => {
+            setAdminStatus('อัปโหลดสำเร็จ ' + result.count + ' ภาพ');
+
+            input.value = '';
+            lastGallerySignature = '';
+            refreshGallery();
+          })
+          .withFailureHandler(error => {
+            setAdminStatus(error.message, true);
+            alert(error.message);
+          })
+          .uploadImages(adminPin, uploadData);
+
+      } catch (error) {
+        setAdminStatus(error.message, true);
+      }
+    }
+
+    // =====================================
+    // DELETE PHOTO
+    // =====================================
+
+    function deletePhoto(fileId, fileName) {
+      if (!adminPin) return;
+
+      if (!confirm('ต้องการลบภาพ "' + fileName + '" หรือไม่?')) return;
+
+      setAdminStatus('กำลังลบภาพ...');
+
+      google.script.run
+        .withSuccessHandler(() => {
+          setAdminStatus('ลบภาพเรียบร้อย');
+
+          lastGallerySignature = '';
+          refreshGallery();
+        })
+        .withFailureHandler(error => {
+          setAdminStatus(error.message, true);
+          alert(error.message);
+        })
+        .deleteImage(adminPin, fileId);
+    }
+
+    // =====================================
+    // SAVE EVENT NAME
+    // =====================================
+
+    function saveEventName() {
+      if (!adminPin) {
+        alert('กรุณาเข้าสู่ระบบ Admin');
+        return;
+      }
+
+      const eventName = document.getElementById('eventNameInput').value.trim();
+
+      if (!eventName) {
+        alert('กรุณากรอกชื่องาน');
+        return;
+      }
+
+      setAdminStatus('กำลังบันทึกชื่องาน...');
+
+      google.script.run
+        .withSuccessHandler(() => {
+          setAdminStatus('บันทึกชื่องานสำเร็จ');
+
+          lastGallerySignature = '';
+          refreshGallery();
+
+          alert('บันทึกชื่องานเรียบร้อย');
+        })
+        .withFailureHandler(error => {
+          setAdminStatus(error.message, true);
+          alert(error.message);
+        })
+        .saveEventName(adminPin, eventName);
+    }
+
+    // =====================================
+    // AUTO SYNC EVERY 15 SECONDS
+    // =====================================
+
+    setInterval(() => {
+      if (document.hidden || isLoading) return;
+
+      isLoading = true;
+
+      google.script.run
+        .withSuccessHandler(data => {
+          isLoading = false;
+          renderGallery(data);
+        })
+        .withFailureHandler(() => {
+          isLoading = false;
+        })
+        .getGalleryImages();
+
+    }, 15000);
+
+    // =====================================
+    // START
+    // =====================================
+
+    loadGallery();
+  </script>
+
+</body>
+</html>
